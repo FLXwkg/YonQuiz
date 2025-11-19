@@ -1,10 +1,10 @@
-import '../../domain/entities/user.dart';
+import '../entities/user_entity.dart';
 
 /// Authentication repository contract
 abstract class AuthRepository {
-  Future<User> login(String email, String password);
-  Future<User> register(String email, String password, String name);
+  Future<UserEntity> login(String email, String password);
+  Future<UserEntity> register(String email, String password, String name);
   Future<void> logout();
-  Future<User> getCurrentUser();
+  Future<UserEntity> getCurrentUser();
   Future<bool> isLoggedIn();
 }
