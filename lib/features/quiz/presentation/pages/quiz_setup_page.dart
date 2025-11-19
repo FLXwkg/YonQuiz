@@ -49,7 +49,7 @@ class QuizSetupPage extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Obx(() => GestureDetector(
-                          onTap: () => controller.selectedQuizType = type,
+                          onTap: () => controller.selectedQuizType.value = type,
                           child: Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
@@ -112,7 +112,7 @@ class QuizSetupPage extends StatelessWidget {
                   inactiveColor: const Color(0xFF457B9D),
                   label: controller.numberOfQuestions.toString(),
                   onChanged: (value) {
-                    controller.numberOfQuestions = value.toInt();
+                    controller.numberOfQuestions.value = value.toInt();
                   },
                 )),
                 Center(
