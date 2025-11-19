@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/onboarding_item.dart';
+import '../../../../core/routes/app_routes.dart';
 
 class OnboardingController extends GetxController {
   final pageController = PageController();
   final currentPage = 0.obs;
 
-  // Liste des 3 écrans onboarding
   final List<OnboardingItem> items = const [
     OnboardingItem(
       title: 'Rejoins l\'équipage !',
@@ -46,9 +45,9 @@ class OnboardingController extends GetxController {
   }
 
   Future<void> finishOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('has_seen_onboarding', true);
-    Get.offAllNamed('/login');
+    // ✅ Ne sauvegarde RIEN, juste navigue
+    print('✅ Onboarding terminé, navigation vers INSCRIPTION');
+    Get.offAllNamed(AppRoutes.register);
   }
 
   @override
