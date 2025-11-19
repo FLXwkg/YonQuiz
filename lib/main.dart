@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'features/auth/presentation/pages/test_api_page.dart';
+import 'package:get/get.dart';
+import 'core/theme/app_theme.dart';
+import 'core/routes/app_pages.dart';
+import 'core/routes/app_routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,10 +13,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'YonQuiz',
-      theme: ThemeData.dark(),
-      home: const TestApiPage(),
+      theme: AppTheme.lightTheme,
+      initialRoute: AppRoutes.splash, // Commence par le splash de ton pote
+      getPages: AppPages.routes,
     );
   }
 }
