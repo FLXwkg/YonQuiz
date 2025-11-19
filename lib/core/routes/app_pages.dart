@@ -7,6 +7,7 @@ import '../../features/quiz/presentation/pages/quiz_setup_page.dart';
 import '../../features/quiz/presentation/pages/quiz_game_page.dart';
 import '../../features/quiz/presentation/pages/quiz_result_page.dart';
 import 'app_routes.dart';
+import 'package:flutter/material.dart';  // ✅ AJOUTÉ
 
 class AppPages {
   static final routes = [
@@ -20,11 +21,38 @@ class AppPages {
       page: () => const OnboardingPage(),
       binding: OnboardingBinding(),
     ),
+    
+    // ✅ ROUTE TEMPORAIRE POUR /register
+    GetPage(
+      name: AppRoutes.register,
+      page: () => const Scaffold(
+        body: Center(
+          child: Text(
+            '📝 Page Inscription (à créer)',
+            style: TextStyle(fontSize: 24),
+          ),
+        ),
+      ),
+    ),
+    
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginPage(),
     ),
     
+    // ✅ ROUTE TEMPORAIRE POUR /home
+    GetPage(
+      name: AppRoutes.home,
+      page: () => const Scaffold(
+        body: Center(
+          child: Text(
+            '🏠 Page Home (à créer par Ewen)',
+            style: TextStyle(fontSize: 24),
+          ),
+        ),
+      ),
+    ),
+
     // Quiz
     GetPage(
       name: AppRoutes.quizSetup,
@@ -38,7 +66,7 @@ class AppPages {
       name: AppRoutes.quizResult,
       page: () => const QuizResultPage(),
     ),
-    
+
     // Learn
     // GetPage(
     //   name: AppRoutes.learnHome,
