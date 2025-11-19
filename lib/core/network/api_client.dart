@@ -1,35 +1,64 @@
-/// API client for HTTP requests
-/// Implement your HTTP client logic here
-class ApiClient {
-  final String baseUrl;
+import 'package:dio/dio.dart';
+import 'package:get/get.dart' as getx;
+import '../constants/api_constants.dart';
 
-  ApiClient({required this.baseUrl});
+class ApiClient extends getx.GetxController {
+  late final Dio _dio;
 
-  /// Perform GET request
-  Future<dynamic> get(String endpoint) async {
-    // Implement your GET request logic
-    // Example using http package:
-    // final response = await http.get(Uri.parse('baseUrl/endpoint'));
-    // return _handleResponse(response);
-    return {}; // Placeholder
+  ApiClient() {
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: ApiConstants.baseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
+
+    _dio.interceptors.add(
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+      ),
+    );
   }
 
-  /// Perform POST request
-  Future<dynamic> post(String endpoint, dynamic data) async {
-    // Implement your POST request logic
-    // Example using http package:
-    // final response = await http.post(
-    //   Uri.parse('baseUrl/endpoint'),
-    //   headers: {'Content-Type': 'application/json'},
-    //   body: json.encode(data),
-    // );
-    // return _handleResponse(response);
-    return {}; // Placeholder
+  Dio get dio => _dio;
+
+  // GET Request
+  Future<Response> get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    try {
+      final response = await _dio.get(
+        path,
+        queryParameters: queryParameters,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  /// Handle HTTP response
-  dynamic _handleResponse(dynamic response) {
-    // Implement your response handling logic
-    return response;
+  // POST Request (si besoin plus tard)
+  Future<Response> post(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    try {
+      final response = await _dio.post(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
   }
 }

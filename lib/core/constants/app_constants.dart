@@ -1,18 +1,14 @@
-/// Application-level constants
 class AppConstants {
-  /// Application name
-  static const String appName = 'yon_quiz';
+  static const String appName = 'YonQuiz';
+  static const String appVersion = '1.0.0';
   
-  /// API endpoints
-  static const String baseUrl = 'https://api.example.com';
+  // Storage Keys
+  static const String keyFirstLaunch = 'first_launch';
+  static const String keyHighScore = 'high_score';
+  static const String keyUserName = 'user_name';
   
-  /// Storage keys
-  static const String tokenKey = 'auth_token';
-  static const String userKey = 'user_data';
-  static const String themeKey = 'app_theme';
-  
-  /// Route names
-  static const String loginRoute = '/login';
-  static const String homeRoute = '/home';
-  static const String splashRoute = '/splash';
+  // Quiz Settings
+  static const int minQuestions = 5;
+  static const int maxQuestions = 50;
+  static const int defaultQuestions = 10;
 }
