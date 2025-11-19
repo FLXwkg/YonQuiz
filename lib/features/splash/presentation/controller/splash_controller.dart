@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/routes/app_routes.dart';
 
 class SplashController extends GetxController {
   @override
@@ -9,30 +10,28 @@ class SplashController extends GetxController {
   }
 
   Future<void> _navigateToNextScreen() async {
-    // Attendre 3 secondes (animation du splash)
     await Future.delayed(const Duration(seconds: 3));
 
-    // Vérifier si c'est la première fois
     final prefs = await SharedPreferences.getInstance();
-    final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
 
-    print('🔍 DEBUG: hasSeenOnboarding = $hasSeenOnboarding'); // Pour débugger
+    final hasCreatedAccount = prefs.getBool('has_created_account') ?? false;
+    final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
 
-    if (!hasSeenOnboarding) {
-      // ✅ Première visite → Onboarding
-      print('📱 Navigation: Vers ONBOARDING');
-      Get.offAllNamed('/onboarding');
+    print('🔍 hasCreatedAccount: $hasCreatedAccount');
+    print('🔍 isLoggedIn: $isLoggedIn');
+
+    if (!hasCreatedAccount) {
+      // ✅ Pas de compte → TOUJOURS montrer l'onboarding
+      print('📱 → ONBOARDING (pas de compte créé)');
+      Get.offAllNamed(AppRoutes.onboarding);
+    } else if (!isLoggedIn) {
+      // ✅ Compte créé mais déconnecté → LOGIN
+      print('📱 → LOGIN (compte créé mais pas connecté)');
+      Get.offAllNamed(AppRoutes.login);
     } else {
-      // Déjà vu l'onboarding → Vérifier si connecté
-      final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
-      
-      if (isLoggedIn) {
-        print('📱 Navigation: Vers HOME (connecté)');
-        Get.offAllNamed('/home'); // Ewen créera cette route
-      } else {
-        print('📱 Navigation: Vers LOGIN (pas connecté)');
-        Get.offAllNamed('/login');
-      }
+      // ✅ Connecté → HOME
+      print('📱 → HOME (connecté)');
+      Get.offAllNamed(AppRoutes.home);
     }
   }
 }

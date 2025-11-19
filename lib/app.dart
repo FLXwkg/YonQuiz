@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'features/splash/presentation/pages/splash_page.dart';
-import 'features/onboarding/presentation/pages/onboarding_page.dart';
-import 'features/onboarding/presentation/bindings/onboarding_binding.dart';
-import 'features/auth/presentation/pages/login_page.dart';
 import 'core/theme/app_theme.dart';
+import 'core/routes/app_pages.dart';  // ✅ Import centralisé
+import 'core/routes/app_routes.dart'; // ✅ Import des routes
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -15,23 +13,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'YonQuiz',
       theme: AppTheme.lightTheme,
-      initialRoute: '/',
-      getPages: [
-        GetPage(
-          name: '/',
-          page: () => const SplashPage(),
-        ),
-        GetPage(
-          name: '/onboarding',
-          page: () => const OnboardingPage(),
-          binding: OnboardingBinding(), // ✅ AJOUTÉ ICI
-        ),
-        GetPage(
-          name: '/login',
-          page: () => const LoginPage(),
-        ),
-        // D'autres routes seront ajoutées ici par Ewen
-      ],
+      initialRoute: AppRoutes.splash,  // ✅ Utilise la constante
+      getPages: AppPages.routes,       // ✅ Utilise les routes centralisées
     );
   }
 }
