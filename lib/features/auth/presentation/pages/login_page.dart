@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:yon_quiz/core/routes/app_routes.dart';
 import '../controller/auth_controller.dart';
 
 class LoginPage extends StatefulWidget {
@@ -49,6 +50,13 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: _performLogin,
               child: const Text('Login'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: A enlever une fois le login fait
+                Get.offAllNamed(AppRoutes.home);
+              },
+              child: const Text('Home shortcut'),
             ),
           ],
         ),

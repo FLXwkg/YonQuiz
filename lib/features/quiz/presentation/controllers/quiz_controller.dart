@@ -16,8 +16,8 @@ class QuizController extends GetxController {
   var hasAnswered = false.obs;
 
   // Config
-  int numberOfQuestions = 10;
-  QuizType selectedQuizType = QuizType.nameToFruit;
+  var numberOfQuestions = 10.obs; 
+  var selectedQuizType = QuizType.nameToFruit.obs;
 
   // Générer les questions
   Future<void> generateQuestions() async {
@@ -41,7 +41,7 @@ class QuizController extends GetxController {
 
       // Mélange et prend les N premiers
       charactersWithFruit.shuffle();
-      final selectedChars = charactersWithFruit.take(numberOfQuestions).toList();
+      final selectedChars = charactersWithFruit.take(numberOfQuestions.value).toList(); // ✅ .value
 
       // Génère les questions selon le type
       for (var char in selectedChars) {
@@ -67,7 +67,7 @@ class QuizController extends GetxController {
     CharacterModel character,
     List<CharacterModel> allCharacters,
   ) {
-    switch (selectedQuizType) {
+    switch (selectedQuizType.value) { // ✅ .value
       case QuizType.nameToFruit:
         return _generateNameToFruitQuestion(character, allCharacters);
       case QuizType.fruitToName:

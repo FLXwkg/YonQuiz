@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:yon_quiz/features/home/presentation/pages/home_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/onboarding/presentation/bindings/onboarding_binding.dart';
@@ -43,14 +44,7 @@ class AppPages {
     // ✅ ROUTE TEMPORAIRE POUR /home
     GetPage(
       name: AppRoutes.home,
-      page: () => const Scaffold(
-        body: Center(
-          child: Text(
-            '🏠 Page Home (à créer par Ewen)',
-            style: TextStyle(fontSize: 24),
-          ),
-        ),
-      ),
+      page: () => const HomePage()
     ),
 
     // Quiz
