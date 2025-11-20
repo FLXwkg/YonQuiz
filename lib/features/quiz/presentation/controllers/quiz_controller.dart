@@ -12,6 +12,7 @@ class QuizController extends GetxController {
   var currentQuestionIndex = 0.obs;
   var score = 0.obs;
   var questions = <QuizQuestion>[].obs;
+  var preselectedAnswerIndex = Rx<int?>(null);
   var selectedAnswerIndex = Rx<int?>(null);
   var hasAnswered = false.obs;
 
@@ -86,17 +87,21 @@ class QuizController extends GetxController {
   ) {
     final correctAnswer = character.fruit!.name!;
     
-    // Génère 3 mauvaises réponses
-    final wrongAnswers = allCharacters
+    // Récupère TOUS les fruits différents du bon
+    final allWrongAnswers = allCharacters
         .where((c) => 
             c.fruit != null && 
             c.fruit!.name != null && 
             c.fruit!.name != correctAnswer)
         .map((c) => c.fruit!.name!)
-        .toSet()
-        .take(3)
+        .toSet() // Évite les doublons
         .toList();
 
+    // Mélange et prend 3 au hasard
+    allWrongAnswers.shuffle();
+    final wrongAnswers = allWrongAnswers.take(3).toList();
+
+    // Crée les options et les mélange
     final options = [...wrongAnswers, correctAnswer];
     options.shuffle();
 
@@ -115,14 +120,18 @@ class QuizController extends GetxController {
   ) {
     final correctAnswer = character.name!;
     
-    // Génère 3 mauvaises réponses
-    final wrongAnswers = allCharacters
+    // Récupère TOUS les noms différents du bon
+    final allWrongAnswers = allCharacters
         .where((c) => c.name != null && c.name != correctAnswer)
         .map((c) => c.name!)
         .toSet()
-        .take(3)
         .toList();
 
+    // Mélange et prend 3 au hasard
+    allWrongAnswers.shuffle();
+    final wrongAnswers = allWrongAnswers.take(3).toList();
+
+    // Crée les options et les mélange
     final options = [...wrongAnswers, correctAnswer];
     options.shuffle();
 
@@ -141,16 +150,40 @@ class QuizController extends GetxController {
   ) {
     final correctAnswer = character.crew?.name ?? 'Aucun équipage';
     
-    final wrongAnswers = allCharacters
+    // Récupère TOUS les équipages différents du bon
+    final allWrongAnswers = allCharacters
         .where((c) => 
             c.crew != null && 
             c.crew!.name != null && 
             c.crew!.name != correctAnswer)
         .map((c) => c.crew!.name!)
         .toSet()
-        .take(3)
         .toList();
 
+    // Mélange et prend 3 au hasard
+    allWrongAnswers.shuffle();
+    final wrongAnswers = allWrongAnswers.take(3).toList();
+
+    // Si pas assez d'équipages, ajoute des options génériques
+    while (wrongAnswers.length < 3) {
+      final genericOptions = [
+        'Pirates du Soleil',
+        'Pirates aux cent bêtes',
+        'Baroque Works',
+        'CP9',
+        'Marines',
+        'Aucun équipage'
+      ];
+      genericOptions.shuffle();
+      for (var option in genericOptions) {
+        if (!wrongAnswers.contains(option) && option != correctAnswer) {
+          wrongAnswers.add(option);
+          if (wrongAnswers.length >= 3) break;
+        }
+      }
+    }
+
+    // Crée les options et les mélange
     final options = [...wrongAnswers, correctAnswer];
     options.shuffle();
 
@@ -169,15 +202,34 @@ class QuizController extends GetxController {
   ) {
     final correctAnswer = character.size ?? 'Inconnue';
     
-    final wrongAnswers = allCharacters
+    // Récupère TOUTES les tailles différentes de la bonne
+    final allWrongAnswers = allCharacters
         .where((c) => 
             c.size != null && 
             c.size != correctAnswer)
         .map((c) => c.size!)
         .toSet()
-        .take(3)
         .toList();
 
+    // Mélange et prend 3 au hasard
+    allWrongAnswers.shuffle();
+    final wrongAnswers = allWrongAnswers.take(3).toList();
+
+    // Si pas assez de tailles, génère des tailles aléatoires proches
+    if (wrongAnswers.length < 3) {
+      final correctSize = int.tryParse(correctAnswer.replaceAll(RegExp(r'[^0-9]'), ''));
+      if (correctSize != null) {
+        while (wrongAnswers.length < 3) {
+          final offset = [10, 20, 30, -10, -20, -30][wrongAnswers.length];
+          final fakeSize = '${correctSize + offset}cm';
+          if (!wrongAnswers.contains(fakeSize) && fakeSize != correctAnswer) {
+            wrongAnswers.add(fakeSize);
+          }
+        }
+      }
+    }
+
+    // Crée les options et les mélange
     final options = [...wrongAnswers, correctAnswer];
     options.shuffle();
 
@@ -189,15 +241,21 @@ class QuizController extends GetxController {
     );
   }
 
-  // Sélectionner une réponse
-  void selectAnswer(int index) {
+  void preselectAnswer(int index) {
     if (hasAnswered.value) return;
+    preselectedAnswerIndex.value = index;
+    print('🟡 Réponse présélectionnée: $index');
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Valider la réponse présélectionnée
+  void validateAnswer() {
+    if (hasAnswered.value || preselectedAnswerIndex.value == null) return;
     
-    selectedAnswerIndex.value = index;
+    selectedAnswerIndex.value = preselectedAnswerIndex.value;
     hasAnswered.value = true;
 
     // Vérifie si c'est correct
-    if (index == questions[currentQuestionIndex.value].correctAnswerIndex) {
+    if (selectedAnswerIndex.value == questions[currentQuestionIndex.value].correctAnswerIndex) {
       score.value++;
       print('✅ Bonne réponse ! Score: ${score.value}');
     } else {
@@ -206,9 +264,10 @@ class QuizController extends GetxController {
   }
 
   // Question suivante
-  void nextQuestion() {
+    void nextQuestion() {
     if (currentQuestionIndex.value < questions.length - 1) {
       currentQuestionIndex.value++;
+      preselectedAnswerIndex.value = null; // ✅ Reset présélection
       selectedAnswerIndex.value = null;
       hasAnswered.value = false;
     } else {
@@ -221,6 +280,7 @@ class QuizController extends GetxController {
   void restart() {
     currentQuestionIndex.value = 0;
     score.value = 0;
+    preselectedAnswerIndex.value = null; // ✅ Reset présélection
     selectedAnswerIndex.value = null;
     hasAnswered.value = false;
     generateQuestions();
@@ -230,6 +290,7 @@ class QuizController extends GetxController {
   void reset() {
     currentQuestionIndex.value = 0;
     score.value = 0;
+    preselectedAnswerIndex.value = null; // ✅ Reset présélection
     selectedAnswerIndex.value = null;
     hasAnswered.value = false;
     questions.clear();
