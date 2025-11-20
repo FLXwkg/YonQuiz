@@ -120,11 +120,11 @@ class QuizGamePage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 25),
 
-                  // Question
+                  // Question (avec image en petit à gauche si disponible)
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1D3557),
                       borderRadius: BorderRadius.circular(20),
@@ -140,157 +140,263 @@ class QuizGamePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Text(
-                      question.question,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFF1FAEE),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // Options de réponses
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: question.options.length,
-                      itemBuilder: (context, index) {
-                        final isSelected = controller.selectedAnswerIndex.value == index;
-                        final isCorrect = index == question.correctAnswerIndex;
-                        final hasAnswered = controller.hasAnswered.value;
-
-                        Color backgroundColor;
-                        Color borderColor;
-                        
-                        if (hasAnswered) {
-                          if (isCorrect) {
-                            backgroundColor = const Color(0xFF06D6A0);
-                            borderColor = const Color(0xFF06D6A0);
-                          } else if (isSelected) {
-                            backgroundColor = const Color(0xFFE63946);
-                            borderColor = const Color(0xFFE63946);
-                          } else {
-                            backgroundColor = const Color(0xFF457B9D);
-                            borderColor = const Color(0xFF457B9D);
-                          }
-                        } else {
-                          backgroundColor = isSelected
-                              ? const Color(0xFFFFD60A)
-                              : const Color(0xFF457B9D);
-                          borderColor = isSelected
-                              ? const Color(0xFFFFD60A)
-                              : Colors.transparent;
-                        }
-
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: GestureDetector(
-                            onTap: hasAnswered 
-                                ? null 
-                                : () => controller.selectAnswer(index),
-                            child: Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: backgroundColor,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: borderColor,
-                                  width: 3,
-                                ),
-                                boxShadow: [
-                                  if (isSelected && !hasAnswered)
-                                    BoxShadow(
-                                      color: const Color(0xFFFFD60A).withOpacity(0.5),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 5),
-                                    ),
-                                ],
+                    child: Row(
+                      children: [
+                        // Image du fruit (petite, à gauche)
+                        if (question.questionImage != null && question.questionImage!.isNotEmpty)
+                          Container(
+                            margin: const EdgeInsets.only(right: 16),
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFFFFD60A),
+                                width: 2,
                               ),
-                              child: Row(
-                                children: [
-                                  // Lettre (A, B, C, D)
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: hasAnswered
-                                          ? Colors.white.withOpacity(0.3)
-                                          : Colors.black.withOpacity(0.2),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        String.fromCharCode(65 + index), // A, B, C, D
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFF1FAEE),
-                                        ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                question.questionImage!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: const Color(0xFF457B9D),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        color: Color(0xFFF1FAEE),
+                                        size: 24,
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  
-                                  // Texte de la réponse
-                                  Expanded(
-                                    child: Text(
-                                      question.options[index],
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: hasAnswered && !isCorrect && !isSelected
-                                            ? const Color(0xFFA8DADC)
-                                            : const Color(0xFFF1FAEE),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // Icône de résultat
-                                  if (hasAnswered)
-                                    Icon(
-                                      isCorrect ? Icons.check_circle : 
-                                      (isSelected ? Icons.cancel : Icons.circle_outlined),
-                                      color: isCorrect 
-                                          ? Colors.white 
-                                          : (isSelected ? Colors.white : Colors.transparent),
-                                      size: 28,
-                                    ),
-                                ],
+                                  );
+                                },
                               ),
                             ),
                           ),
-                        );
-                      },
+                        
+                        // Texte de la question
+                        Expanded(
+                          child: Text(
+                            question.question,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFF1FAEE),
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
 
-                  // Bouton Suivant (apparaît après avoir répondu)
-                  if (controller.hasAnswered.value)
-                    ElevatedButton(
-                      onPressed: controller.nextQuestion,
+                  // Options de réponses (4 fixes, pas de scroll)
+                  Expanded(
+                    child: Column(
+                      children: List.generate(
+                        question.options.length > 4 ? 4 : question.options.length,
+                        (index) {
+                          final isPreselected = controller.preselectedAnswerIndex.value == index;
+                          final isValidated = controller.hasAnswered.value;
+                          final isCorrect = index == question.correctAnswerIndex;
+                          final wasSelected = controller.selectedAnswerIndex.value == index;
+
+                          Color backgroundColor;
+                          Color borderColor;
+                          
+                          if (isValidated) {
+                            // Après validation
+                            if (isCorrect) {
+                              backgroundColor = const Color(0xFF06D6A0);
+                              borderColor = const Color(0xFF06D6A0);
+                            } else if (wasSelected) {
+                              backgroundColor = const Color(0xFFE63946);
+                              borderColor = const Color(0xFFE63946);
+                            } else {
+                              backgroundColor = const Color(0xFF457B9D);
+                              borderColor = const Color(0xFF457B9D);
+                            }
+                          } else {
+                            // Avant validation
+                            backgroundColor = isPreselected
+                                ? const Color(0xFFFFD60A)
+                                : const Color(0xFF457B9D);
+                            borderColor = isPreselected
+                                ? const Color(0xFFFFD60A)
+                                : Colors.transparent;
+                          }
+
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: GestureDetector(
+                                onTap: isValidated 
+                                    ? null 
+                                    : () => controller.preselectAnswer(index),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: backgroundColor,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: borderColor,
+                                      width: 3,
+                                    ),
+                                    boxShadow: [
+                                      if (isPreselected && !isValidated)
+                                        BoxShadow(
+                                          color: const Color(0xFFFFD60A).withOpacity(0.5),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Image OU Lettre (A, B, C, D)
+                                      question.optionImages.isNotEmpty && 
+                                          index < question.optionImages.length &&
+                                          question.optionImages[index] != null &&
+                                          question.optionImages[index]!.isNotEmpty
+                                          ? Container(
+                                              width: 35,
+                                              height: 35,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: const Color(0xFFF1FAEE),
+                                                  width: 2,
+                                                ),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(6),
+                                                child: Image.network(
+                                                  question.optionImages[index]!,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return Container(
+                                                      color: const Color(0xFF457B9D),
+                                                      child: Center(
+                                                        child: Text(
+                                                          String.fromCharCode(65 + index),
+                                                          style: const TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: Color(0xFFF1FAEE),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            )
+                                          : Container(
+                                              width: 35,
+                                              height: 35,
+                                              decoration: BoxDecoration(
+                                                color: isValidated
+                                                    ? Colors.white.withOpacity(0.3)
+                                                    : Colors.black.withOpacity(0.2),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  String.fromCharCode(65 + index), // A, B, C, D
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xFFF1FAEE),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                      const SizedBox(width: 12),
+                                      
+                                      // Texte de la réponse
+                                      Expanded(
+                                        child: Text(
+                                          question.options[index],
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: isValidated && !isCorrect && !wasSelected
+                                                ? const Color(0xFFA8DADC)
+                                                : const Color(0xFFF1FAEE),
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+
+                                      // Icône de résultat
+                                      if (isValidated)
+                                        Icon(
+                                          isCorrect ? Icons.check_circle : 
+                                          (wasSelected ? Icons.cancel : Icons.circle_outlined),
+                                          color: isCorrect 
+                                              ? Colors.white 
+                                              : (wasSelected ? Colors.white : Colors.transparent),
+                                          size: 24,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Bouton unique (toujours visible, change de texte et état)
+                  Obx(() {
+                    final hasAnswered = controller.hasAnswered.value;
+                    final hasPreselected = controller.preselectedAnswerIndex.value != null;
+                    final isEnabled = hasAnswered || hasPreselected;
+
+                    return ElevatedButton(
+                      onPressed: isEnabled
+                          ? () {
+                              if (hasAnswered) {
+                                controller.nextQuestion();
+                              } else {
+                                controller.validateAnswer();
+                              }
+                            }
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFFD60A),
                         foregroundColor: Colors.black,
+                        disabledBackgroundColor: const Color(0xFF457B9D),
+                        disabledForegroundColor: const Color(0xFFA8DADC),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: Text(
-                        controller.currentQuestionIndex.value < controller.questions.length - 1
-                            ? 'QUESTION SUIVANTE'
-                            : 'VOIR LES RÉSULTATS',
+                        hasAnswered
+                            ? (controller.currentQuestionIndex.value < controller.questions.length - 1
+                                ? 'QUESTION SUIVANTE'
+                                : 'VOIR LES RÉSULTATS')
+                            : 'VALIDER',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
+                    );
+                  }),
                 ],
               ),
             );
