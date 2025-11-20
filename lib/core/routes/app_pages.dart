@@ -7,6 +7,8 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/quiz/presentation/pages/quiz_setup_page.dart';
 import '../../features/quiz/presentation/pages/quiz_game_page.dart';
 import '../../features/quiz/presentation/pages/quiz_result_page.dart';
+import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/auth/presentation/bindings/register_binding.dart';
 import 'app_routes.dart';
 import 'package:flutter/material.dart';  // ✅ AJOUTÉ
 
@@ -23,17 +25,10 @@ class AppPages {
       binding: OnboardingBinding(),
     ),
     
-    // ✅ ROUTE TEMPORAIRE POUR /register
-    GetPage(
+ GetPage(
       name: AppRoutes.register,
-      page: () => const Scaffold(
-        body: Center(
-          child: Text(
-            '📝 Page Inscription (à créer)',
-            style: TextStyle(fontSize: 24),
-          ),
-        ),
-      ),
+      page: () => const RegisterPage(),
+      binding: RegisterBinding(),
     ),
     
     GetPage(
