@@ -58,7 +58,7 @@ class QuizSetupPage extends StatelessWidget {
                                   : const Color(0xFF457B9D),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: controller.selectedQuizType == type
+                                color: controller.selectedQuizType.value == type
                                     ? const Color(0xFFFFD60A)
                                     : Colors.transparent,
                                 width: 3,
@@ -104,26 +104,26 @@ class QuizSetupPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Obx(() => Slider(
-                  value: controller.numberOfQuestions.toDouble(),
+                  value: controller.numberOfQuestions.value.toDouble(),
                   min: 5,
                   max: 20,
                   divisions: 15,
                   activeColor: const Color(0xFFFFD60A),
                   inactiveColor: const Color(0xFF457B9D),
-                  label: controller.numberOfQuestions.toString(),
+                  label: controller.numberOfQuestions.value.toString(),
                   onChanged: (value) {
                     controller.numberOfQuestions.value = value.toInt();
                   },
                 )),
                 Center(
-                  child: Text(
-                    '${controller.numberOfQuestions} questions',
+                  child: Obx(() => Text(
+                    '${controller.numberOfQuestions.value} questions',
                     style: const TextStyle(
                       fontSize: 16,
                       color: Color(0xFFF1FAEE),
                     ),
                   ),
-                ),
+                )),
 
                 const SizedBox(height: 30),
 

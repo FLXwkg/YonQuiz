@@ -12,8 +12,10 @@ class QuizController extends GetxController {
   var currentQuestionIndex = 0.obs;
   var score = 0.obs;
   var questions = <QuizQuestion>[].obs;
+  var preselectedAnswerIndex = Rx<int?>(null);
   var selectedAnswerIndex = Rx<int?>(null);
   var hasAnswered = false.obs;
+  var userAnswers = <int?>[].obs;
 
   // Config
   var numberOfQuestions = 10.obs; 
@@ -24,6 +26,7 @@ class QuizController extends GetxController {
     try {
       isLoading.value = true;
       questions.clear();
+      userAnswers.clear();
       
       print('🎮 [Quiz] Chargement des personnages...');
       final characters = await _apiService.getCharacters();
@@ -47,6 +50,7 @@ class QuizController extends GetxController {
       for (var char in selectedChars) {
         final question = _generateQuestion(char, charactersWithFruit);
         questions.add(question);
+        userAnswers.add(null);
       }
 
       print('✅ [Quiz] ${questions.length} questions générées');
@@ -85,27 +89,50 @@ class QuizController extends GetxController {
     List<CharacterModel> allCharacters,
   ) {
     final correctAnswer = character.fruit!.name!;
+    final correctImage = character.fruit!.filename;
+
+    final fruitToImage = <String, String?>{};
+    for (var c in allCharacters) {
+      if (c.fruit?.name != null) {
+        fruitToImage[c.fruit!.name!] = c.fruit!.filename;
+      }
+    }
     
-    // Génère 3 mauvaises réponses
-    final wrongAnswers = allCharacters
+    // Récupère TOUS les fruits différents du bon
+    final allWrongAnswers = allCharacters
         .where((c) => 
             c.fruit != null && 
             c.fruit!.name != null && 
             c.fruit!.name != correctAnswer)
         .map((c) => c.fruit!.name!)
-        .toSet()
-        .take(3)
+        .toSet() // Évite les doublons
         .toList();
 
-    final options = [...wrongAnswers, correctAnswer];
-    options.shuffle();
+    // Mélange et prend 3 au hasard
+    allWrongAnswers.shuffle();
+    final wrongAnswers = allWrongAnswers.take(3).toList();
 
-    return QuizQuestion(
-      question: 'Quel est le fruit du démon de ${character.name} ?',
-      options: options,
-      correctAnswerIndex: options.indexOf(correctAnswer),
-      type: QuizType.nameToFruit,
+    // Crée les options et les mélange
+    final options = [...wrongAnswers, correctAnswer];
+    final optionImages = options.map((fruit) => fruitToImage[fruit]).toList();
+  
+    // Mélange ensemble options et images
+    final combined = List.generate(
+      options.length, 
+      (i) => {'option': options[i], 'image': optionImages[i]}
     );
+    combined.shuffle();
+    
+    final shuffledOptions = combined.map((e) => e['option'] as String).toList();
+    final shuffledImages = combined.map((e) => e['image'] as String?).toList();
+  
+  return QuizQuestion(
+    question: 'Quel est le fruit du démon de ${character.name} ?',
+    options: shuffledOptions,
+    correctAnswerIndex: shuffledOptions.indexOf(correctAnswer),
+    type: QuizType.nameToFruit,
+    optionImages: shuffledImages,
+  );
   }
 
   // Question : Fruit → Nom
@@ -114,15 +141,20 @@ class QuizController extends GetxController {
     List<CharacterModel> allCharacters,
   ) {
     final correctAnswer = character.name!;
+    final fruitImage = character.fruit!.filename;
     
-    // Génère 3 mauvaises réponses
-    final wrongAnswers = allCharacters
+    // Récupère TOUS les noms différents du bon
+    final allWrongAnswers = allCharacters
         .where((c) => c.name != null && c.name != correctAnswer)
         .map((c) => c.name!)
         .toSet()
-        .take(3)
         .toList();
 
+    // Mélange et prend 3 au hasard
+    allWrongAnswers.shuffle();
+    final wrongAnswers = allWrongAnswers.take(3).toList();
+
+    // Crée les options et les mélange
     final options = [...wrongAnswers, correctAnswer];
     options.shuffle();
 
@@ -131,6 +163,7 @@ class QuizController extends GetxController {
       options: options,
       correctAnswerIndex: options.indexOf(correctAnswer),
       type: QuizType.fruitToName,
+      questionImage: fruitImage,
     );
   }
 
@@ -141,16 +174,40 @@ class QuizController extends GetxController {
   ) {
     final correctAnswer = character.crew?.name ?? 'Aucun équipage';
     
-    final wrongAnswers = allCharacters
+    // Récupère TOUS les équipages différents du bon
+    final allWrongAnswers = allCharacters
         .where((c) => 
             c.crew != null && 
             c.crew!.name != null && 
             c.crew!.name != correctAnswer)
         .map((c) => c.crew!.name!)
         .toSet()
-        .take(3)
         .toList();
 
+    // Mélange et prend 3 au hasard
+    allWrongAnswers.shuffle();
+    final wrongAnswers = allWrongAnswers.take(3).toList();
+
+    // Si pas assez d'équipages, ajoute des options génériques
+    while (wrongAnswers.length < 3) {
+      final genericOptions = [
+        'Pirates du Soleil',
+        'Pirates aux cent bêtes',
+        'Baroque Works',
+        'CP9',
+        'Marines',
+        'Aucun équipage'
+      ];
+      genericOptions.shuffle();
+      for (var option in genericOptions) {
+        if (!wrongAnswers.contains(option) && option != correctAnswer) {
+          wrongAnswers.add(option);
+          if (wrongAnswers.length >= 3) break;
+        }
+      }
+    }
+
+    // Crée les options et les mélange
     final options = [...wrongAnswers, correctAnswer];
     options.shuffle();
 
@@ -167,17 +224,51 @@ class QuizController extends GetxController {
     CharacterModel character,
     List<CharacterModel> allCharacters,
   ) {
-    final correctAnswer = character.size ?? 'Inconnue';
+    final correctAnswer = (character.size != null && character.size!.isNotEmpty) 
+      ? character.size! 
+      : 'Taille inconnue';
     
-    final wrongAnswers = allCharacters
+    // Récupère TOUTES les tailles différentes de la bonne
+    final allWrongAnswers = allCharacters
         .where((c) => 
             c.size != null && 
+            c.size!.isNotEmpty &&
             c.size != correctAnswer)
         .map((c) => c.size!)
         .toSet()
-        .take(3)
         .toList();
 
+    // Mélange et prend 3 au hasard
+    allWrongAnswers.shuffle();
+    final wrongAnswers = allWrongAnswers.take(3).toList();
+
+    // Si pas assez de tailles, génère des tailles aléatoires proches
+    if (wrongAnswers.length < 3) {
+      // Si c'est "Taille inconnue", ajoute des tailles génériques
+      if (correctAnswer == 'Taille inconnue') {
+        final genericSizes = ['170cm', '456cm', '190cm', '200cm', '160cm', '100cm'];
+        genericSizes.shuffle();
+        for (var size in genericSizes) {
+          if (!wrongAnswers.contains(size) && wrongAnswers.length < 3) {
+            wrongAnswers.add(size);
+          }
+        }
+      } else {
+        // Sinon génère des tailles proches
+        final correctSize = int.tryParse(correctAnswer.replaceAll(RegExp(r'[^0-9]'), ''));
+        if (correctSize != null) {
+          while (wrongAnswers.length < 3) {
+            final offset = [10, 20, 30, -10, -20, -30][wrongAnswers.length % 6];
+            final fakeSize = '${correctSize + offset}cm';
+            if (!wrongAnswers.contains(fakeSize) && fakeSize != correctAnswer) {
+              wrongAnswers.add(fakeSize);
+            }
+          }
+        }
+      }
+    }
+
+    // Crée les options et les mélange
     final options = [...wrongAnswers, correctAnswer];
     options.shuffle();
 
@@ -189,15 +280,23 @@ class QuizController extends GetxController {
     );
   }
 
-  // Sélectionner une réponse
-  void selectAnswer(int index) {
+  void preselectAnswer(int index) {
     if (hasAnswered.value) return;
+    preselectedAnswerIndex.value = index;
+    print('🟡 Réponse présélectionnée: $index');
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Valider la réponse présélectionnée
+  void validateAnswer() {
+    if (hasAnswered.value || preselectedAnswerIndex.value == null) return;
     
-    selectedAnswerIndex.value = index;
+    selectedAnswerIndex.value = preselectedAnswerIndex.value;
     hasAnswered.value = true;
 
+    userAnswers[currentQuestionIndex.value] = selectedAnswerIndex.value;
+
     // Vérifie si c'est correct
-    if (index == questions[currentQuestionIndex.value].correctAnswerIndex) {
+    if (selectedAnswerIndex.value == questions[currentQuestionIndex.value].correctAnswerIndex) {
       score.value++;
       print('✅ Bonne réponse ! Score: ${score.value}');
     } else {
@@ -206,9 +305,10 @@ class QuizController extends GetxController {
   }
 
   // Question suivante
-  void nextQuestion() {
+    void nextQuestion() {
     if (currentQuestionIndex.value < questions.length - 1) {
       currentQuestionIndex.value++;
+      preselectedAnswerIndex.value = null; // ✅ Reset présélection
       selectedAnswerIndex.value = null;
       hasAnswered.value = false;
     } else {
@@ -221,8 +321,10 @@ class QuizController extends GetxController {
   void restart() {
     currentQuestionIndex.value = 0;
     score.value = 0;
+    preselectedAnswerIndex.value = null; // ✅ Reset présélection
     selectedAnswerIndex.value = null;
     hasAnswered.value = false;
+    userAnswers.clear();
     generateQuestions();
   }
 
@@ -230,8 +332,10 @@ class QuizController extends GetxController {
   void reset() {
     currentQuestionIndex.value = 0;
     score.value = 0;
+    preselectedAnswerIndex.value = null; // ✅ Reset présélection
     selectedAnswerIndex.value = null;
     hasAnswered.value = false;
     questions.clear();
+    userAnswers.clear();
   }
 }
