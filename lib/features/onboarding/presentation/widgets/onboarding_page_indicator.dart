@@ -16,12 +16,13 @@ class OnboardingPageIndicator extends StatelessWidget {
     return SmoothPageIndicator(
       controller: controller,
       count: count,
-      effect: const WormEffect(
+      effect: ExpandingDotsEffect(
         activeDotColor: Colors.amber,
-        dotColor: Colors.white24,
-        dotHeight: 12,
-        dotWidth: 12,
-        spacing: 16,
+        dotColor: Colors.white.withOpacity(0.3),
+        dotHeight: 10,
+        dotWidth: 10,
+        expansionFactor: 4,
+        spacing: 8,
       ),
     );
   }
