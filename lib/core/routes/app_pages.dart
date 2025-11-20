@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:yon_quiz/features/home/presentation/pages/home_page.dart';
+import 'package:yon_quiz/features/learn/presentation/pages/detail_page.dart';
 import 'package:yon_quiz/features/learn/presentation/pages/fruits_list_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
@@ -73,6 +74,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.fruitsList,
       page: () => const FruitsListPage(),
+    ),
+    GetPage(
+      name: AppRoutes.detail,
+      page: () => const DetailPage(),
     ),
   ];
 }

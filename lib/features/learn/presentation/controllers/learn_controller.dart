@@ -15,6 +15,9 @@ class LearnController extends GetxController {
   // Recherche
   var searchQuery = ''.obs;
 
+  // Filtre
+  var selectedFruitType = Rx<String?>(null);
+
   // Filtrer les personnages selon la recherche
   List<CharacterModel> get filteredCharacters {
     if (searchQuery.value.isEmpty) {
@@ -27,16 +30,27 @@ class LearnController extends GetxController {
     }).toList();
   }
 
-  // Filtrer les fruits selon la recherche
+  // Filtrer les fruits selon la recherche et le type
   List<FruitModel> get filteredFruits {
-    if (searchQuery.value.isEmpty) {
-      return fruits;
+    var result = fruits.toList();
+
+    // Filtre par recherche
+    if (searchQuery.value.isNotEmpty) {
+      result = result.where((fruit) {
+        final name = fruit.name?.toLowerCase() ?? '';
+        final query = searchQuery.value.toLowerCase();
+        return name.contains(query);
+      }).toList();
     }
-    return fruits.where((fruit) {
-      final name = fruit.name?.toLowerCase() ?? '';
-      final query = searchQuery.value.toLowerCase();
-      return name.contains(query);
-    }).toList();
+
+    // Filtre par type
+    if (selectedFruitType.value != null) {
+      result = result.where((fruit) {
+        return fruit.type?.toLowerCase() == selectedFruitType.value?.toLowerCase();
+      }).toList();
+    }
+
+    return result;
   }
 
   // Charger les personnages
@@ -90,5 +104,16 @@ class LearnController extends GetxController {
   // Reset recherche
   void clearSearch() {
     searchQuery.value = '';
+  }
+
+  // Reset filtre type 
+  void clearTypeFilter() {
+    selectedFruitType.value = null;
+  }
+
+  // Reset tout 
+  void clearAllFilters() {
+    searchQuery.value = '';
+    selectedFruitType.value = null;
   }
 }

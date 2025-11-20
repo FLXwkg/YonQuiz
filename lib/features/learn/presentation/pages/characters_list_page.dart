@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:yon_quiz/core/routes/app_routes.dart';
 import '../controllers/learn_controller.dart';
 
 class CharactersListPage extends StatelessWidget {
@@ -125,151 +126,165 @@ class _CharacterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1D3557),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFE63946),
-          width: 2,
+    return  GestureDetector( // ✅ AJOUT : Wrapper avec GestureDetector
+      onTap: () {
+        // ✅ AJOUT : Navigation vers détail
+        Get.toNamed(
+          AppRoutes.detail,
+          arguments: {'type': 'character', 'data': character},
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1D3557),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFFE63946),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Nom du personnage
-          Row(
-            children: [
-              const Icon(
-                Icons.person,
-                color: Color(0xFFFFD60A),
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  character.name ?? 'Inconnu',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFF1FAEE),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const Divider(color: Color(0xFF457B9D), height: 24),
-
-          // Infos
-          _InfoRow(
-            icon: Icons.cake,
-            label: 'Âge',
-            value: character.age ?? 'Inconnu',
-          ),
-          const SizedBox(height: 8),
-          _InfoRow(
-            icon: Icons.height,
-            label: 'Taille',
-            value: character.size ?? 'Inconnue',
-          ),
-          const SizedBox(height: 8),
-          _InfoRow(
-            icon: Icons.monetization_on,
-            label: 'Prime',
-            value: character.bounty ?? 'Aucune',
-          ),
-          const SizedBox(height: 8),
-          _InfoRow(
-            icon: Icons.work,
-            label: 'Poste',
-            value: character.job ?? 'Inconnu',
-          ),
-          const SizedBox(height: 8),
-          _InfoRow(
-            icon: Icons.group,
-            label: 'Équipage',
-            value: character.crew?.name ?? 'Aucun',
-          ),
-
-          // Fruit du démon
-          if (character.fruit != null) ...[
-            const Divider(color: Color(0xFF457B9D), height: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Nom du personnage
             Row(
               children: [
-                if (character.fruit!.filename != null && character.fruit!.filename!.isNotEmpty)
-                  Container(
-                    width: 50,
-                    height: 50,
-                    margin: const EdgeInsets.only(right: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: const Color(0xFF06D6A0),
-                        width: 2,
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        character.fruit!.filename!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: const Color(0xFF457B9D),
-                            child: const Icon(
-                              Icons.eco,
-                              color: Color(0xFF06D6A0),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                const Icon(
+                  Icons.person,
+                  color: Color(0xFFFFD60A),
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Fruit du Démon',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFFA8DADC),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        character.fruit!.name ?? 'Inconnu',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF06D6A0),
-                        ),
-                      ),
-                      Text(
-                        'Type: ${character.fruit!.type ?? "?"}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFFA8DADC),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    character.name ?? 'Inconnu',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFF1FAEE),
+                    ),
                   ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Color(0xFFA8DADC),
+                  size: 20,
                 ),
               ],
             ),
+
+            const Divider(color: Color(0xFF457B9D), height: 24),
+
+            // Infos
+            _InfoRow(
+              icon: Icons.cake,
+              label: 'Âge',
+              value: character.age ?? 'Inconnu',
+            ),
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.height,
+              label: 'Taille',
+              value: character.size ?? 'Inconnue',
+            ),
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.monetization_on,
+              label: 'Prime',
+              value: character.bounty ?? 'Aucune',
+            ),
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.work,
+              label: 'Poste',
+              value: character.job ?? 'Inconnu',
+            ),
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.group,
+              label: 'Équipage',
+              value: character.crew?.name ?? 'Aucun',
+            ),
+
+            // Fruit du démon
+            if (character.fruit != null) ...[
+              const Divider(color: Color(0xFF457B9D), height: 24),
+              Row(
+                children: [
+                  if (character.fruit!.filename != null && character.fruit!.filename!.isNotEmpty)
+                    Container(
+                      width: 50,
+                      height: 50,
+                      margin: const EdgeInsets.only(right: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: const Color(0xFF06D6A0),
+                          width: 2,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          character.fruit!.filename!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: const Color(0xFF457B9D),
+                              child: const Icon(
+                                Icons.eco,
+                                color: Color(0xFF06D6A0),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Fruit du Démon',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFA8DADC),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          character.fruit!.name ?? 'Inconnu',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF06D6A0),
+                          ),
+                        ),
+                        Text(
+                          'Type: ${character.fruit!.type ?? "?"}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFA8DADC),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
-        ],
-      ),
+        ),
+      )
     );
   }
 }
