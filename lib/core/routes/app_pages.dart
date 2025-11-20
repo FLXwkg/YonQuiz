@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:yon_quiz/features/home/presentation/pages/home_page.dart';
+import 'package:yon_quiz/features/learn/presentation/pages/detail_page.dart';
+import 'package:yon_quiz/features/learn/presentation/pages/fruits_list_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/onboarding/presentation/bindings/onboarding_binding.dart';
@@ -9,6 +11,8 @@ import '../../features/quiz/presentation/pages/quiz_game_page.dart';
 import '../../features/quiz/presentation/pages/quiz_result_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/bindings/register_binding.dart';
+import '../../features/learn/presentation/pages/learn_home_page.dart';
+import '../../features/learn/presentation/pages/characters_list_page.dart';
 import '../../features/auth/presentation/bindings/login_binding.dart';
 import 'app_routes.dart';
 
@@ -59,9 +63,21 @@ class AppPages {
     ),
 
     // Learn
-    // GetPage(
-    //   name: AppRoutes.learnHome,
-    //   page: () => const LearnHomePage(),
-    // ),
+    GetPage(
+      name: AppRoutes.learnHome,
+      page: () => const LearnHomePage(),
+    ),
+    GetPage(
+      name: AppRoutes.charactersList,
+      page: () => const CharactersListPage(),
+    ),
+    GetPage(
+      name: AppRoutes.fruitsList,
+      page: () => const FruitsListPage(),
+    ),
+    GetPage(
+      name: AppRoutes.detail,
+      page: () => const DetailPage(),
+    ),
   ];
 }
