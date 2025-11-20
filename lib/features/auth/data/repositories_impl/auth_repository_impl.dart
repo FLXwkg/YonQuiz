@@ -16,6 +16,7 @@ class AuthRepositoryImpl implements AuthRepository {
       gender: 'homme',  // ✅ Ajouté
       email: email,
       createdAt: DateTime.now(),
+      password: password,
     );
     
     return userModel.toEntity();
@@ -33,6 +34,7 @@ class AuthRepositoryImpl implements AuthRepository {
       gender: 'homme', // Par défaut
       email: email,
       createdAt: DateTime.now(),
+      password: password,
     );
     
     return userModel.toEntity();
@@ -52,6 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
       gender: 'homme',
       email: 'test@example.com',
       createdAt: DateTime.now(),
+      password: 'password123',
     );
     
     return userModel.toEntity();

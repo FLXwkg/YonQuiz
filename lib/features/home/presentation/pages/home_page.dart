@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/routes/app_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Remplacer par le vrai nom de l'utilisateur une fois le login fait
-    final String userName = 'Capitaine'; 
+    // Pour l'instant, on utilise un nom d'utilisateur statique
+
+    const String userName = 'Capitaine'; 
 
     return Scaffold(
       body: Container(
@@ -38,9 +40,9 @@ class HomePage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                Text(
+                const Text(
                   'Bienvenue, $userName !',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFF1FAEE),
@@ -58,7 +60,7 @@ class HomePage extends StatelessWidget {
                   color: const Color(0xFF06D6A0),
                   onTap: () {
                     Get.toNamed(AppRoutes.learnHome);
-                    // TODO: Ton pote implémentera cette page
+                    // 
                   },
                 ),
 
@@ -97,17 +99,28 @@ class HomePage extends StatelessWidget {
 
                 const Spacer(),
 
-                // Bouton Déconnexion (temporaire)
-                TextButton.icon(
-                  onPressed: () {
-                    Get.offAllNamed(AppRoutes.login);
-                  },
-                  icon: const Icon(Icons.logout, color: Color(0xFFF1FAEE)),
-                  label: const Text(
-                    'Déconnexion',
-                    style: TextStyle(color: Color(0xFFF1FAEE)),
-                  ),
-                ),
+                // Bouton Déconnexion
+ElevatedButton(
+  onPressed: () async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    // ✅ On met juste is_logged_in à false
+    await prefs.setBool('is_logged_in', false);
+    // ⚠️ NE PAS toucher à has_created_account !
+    
+    Get.snackbar(
+      '👋 À bientôt !',
+      'Tu as été déconnecté',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.orange,
+      colorText: Colors.white,
+    );
+    
+    // ✅ Retour sur le LOGIN (pas l'onboarding)
+    Get.offAllNamed(AppRoutes.login);
+  },
+  child: const Text('Déconnexion'),
+),
 
                 const SizedBox(height: 20),
               ],
