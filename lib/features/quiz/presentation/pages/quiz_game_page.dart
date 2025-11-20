@@ -120,76 +120,81 @@ class QuizGamePage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
 
-                  // Question (avec image si disponible)
-                  Column(
-                    children: [
-                      if (question.questionImage != null && question.questionImage!.isNotEmpty)
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          height: 150,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: const Color(0xFFFFD60A),
-                              width: 3,
-                            ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(13),
-                            child: Image.network(
-                              question.questionImage!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: const Color(0xFF457B9D),
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.image_not_supported,
-                                      color: Color(0xFFF1FAEE),
-                                      size: 50,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1D3557),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFFE63946),
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          question.question,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFF1FAEE),
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                  // Question (avec image en petit à gauche si disponible)
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1D3557),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFFE63946),
+                        width: 3,
                       ),
-                    ],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        // Image du fruit (petite, à gauche)
+                        if (question.questionImage != null && question.questionImage!.isNotEmpty)
+                          Container(
+                            margin: const EdgeInsets.only(right: 16),
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFFFFD60A),
+                                width: 2,
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                question.questionImage!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: const Color(0xFF457B9D),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        color: Color(0xFFF1FAEE),
+                                        size: 24,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        
+                        // Texte de la question
+                        Expanded(
+                          child: Text(
+                            question.question,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFF1FAEE),
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
 
                   // Options de réponses (4 fixes, pas de scroll)
                   Expanded(
@@ -276,11 +281,11 @@ class QuizGamePage extends StatelessWidget {
                                                   fit: BoxFit.cover,
                                                   errorBuilder: (context, error, stackTrace) {
                                                     return Container(
-                                                      color: Color(0xFF457B9D),
+                                                      color: const Color(0xFF457B9D),
                                                       child: Center(
                                                         child: Text(
                                                           String.fromCharCode(65 + index),
-                                                          style: TextStyle(
+                                                          style: const TextStyle(
                                                             fontSize: 16,
                                                             fontWeight: FontWeight.bold,
                                                             color: Color(0xFFF1FAEE),
@@ -351,51 +356,47 @@ class QuizGamePage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
-                  // Bouton Valider (apparaît quand une réponse est présélectionnée)
-                  if (!controller.hasAnswered.value && controller.preselectedAnswerIndex.value != null)
-                    ElevatedButton(
-                      onPressed: controller.validateAnswer,
+                  // Bouton unique (toujours visible, change de texte et état)
+                  Obx(() {
+                    final hasAnswered = controller.hasAnswered.value;
+                    final hasPreselected = controller.preselectedAnswerIndex.value != null;
+                    final isEnabled = hasAnswered || hasPreselected;
+
+                    return ElevatedButton(
+                      onPressed: isEnabled
+                          ? () {
+                              if (hasAnswered) {
+                                controller.nextQuestion();
+                              } else {
+                                controller.validateAnswer();
+                              }
+                            }
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFFD60A),
                         foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'VALIDER',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-
-                  // Bouton Suivant (apparaît après avoir validé)
-                  if (controller.hasAnswered.value)
-                    ElevatedButton(
-                      onPressed: controller.nextQuestion,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFD60A),
-                        foregroundColor: Colors.black,
+                        disabledBackgroundColor: const Color(0xFF457B9D),
+                        disabledForegroundColor: const Color(0xFFA8DADC),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: Text(
-                        controller.currentQuestionIndex.value < controller.questions.length - 1
-                            ? 'QUESTION SUIVANTE'
-                            : 'VOIR LES RÉSULTATS',
+                        hasAnswered
+                            ? (controller.currentQuestionIndex.value < controller.questions.length - 1
+                                ? 'QUESTION SUIVANTE'
+                                : 'VOIR LES RÉSULTATS')
+                            : 'VALIDER',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
+                    );
+                  }),
                 ],
               ),
             );
