@@ -19,13 +19,13 @@ class QuizResultPage extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView( // ✅ Ajout du SingleChildScrollView
+          child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
-                mainAxisSize: MainAxisSize.min, // ✅ Changé de max à min
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: 20), // ✅ Ajout d'espace en haut
+                  const SizedBox(height: 20),
                   
                   // Titre
                   const Text(
@@ -161,35 +161,6 @@ class QuizResultPage extends StatelessWidget {
 
                   const SizedBox(height: 50),
 
-                  // Statistiques
-                  Obx(() {
-                    final correct = controller.score.value;
-                    final wrong = controller.questions.length - correct;
-
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Bonnes réponses
-                        _StatCard(
-                          icon: Icons.check_circle,
-                          color: const Color(0xFF06D6A0),
-                          label: 'Correctes',
-                          value: correct.toString(),
-                        ),
-
-                        // Mauvaises réponses
-                        _StatCard(
-                          icon: Icons.cancel,
-                          color: const Color(0xFFE63946),
-                          label: 'Incorrectes',
-                          value: wrong.toString(),
-                        ),
-                      ],
-                    );
-                  }),
-
-                  const SizedBox(height: 50), // ✅ Espace avant les boutons
-
                   // Boutons
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -225,7 +196,7 @@ class QuizResultPage extends StatelessWidget {
                       OutlinedButton.icon(
                         onPressed: () {
                           controller.reset();
-                          Get.offAllNamed('/home'); // ✅ Retour vers home au lieu de 2x back
+                          Get.offAllNamed('/home');
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFF1FAEE),
@@ -250,67 +221,171 @@ class QuizResultPage extends StatelessWidget {
                     ],
                   ),
                   
-                  const SizedBox(height: 40), // ✅ Espace en bas
+                  const SizedBox(height: 40),
+
+                  // Récapitulatif des réponses
+                  const Text(
+                    'Récapitulatif',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFF1FAEE),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 20),
+
+                  // Liste des questions/réponses
+                  Obx(() {
+                    return Column(
+                      children: List.generate(
+                        controller.questions.length,
+                        (index) {
+                          final question = controller.questions[index];
+                          final userAnswerIndex = controller.userAnswers[index];
+                          final isCorrect = userAnswerIndex == question.correctAnswerIndex;
+                          
+                          final userAnswer = userAnswerIndex != null 
+                              ? question.options[userAnswerIndex]
+                              : 'Pas de réponse';
+                          final correctAnswer = question.correctAnswer;
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: isCorrect 
+                                    ? const Color(0xFF06D6A0).withOpacity(0.15)
+                                    : const Color(0xFFE63946).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isCorrect 
+                                      ? const Color(0xFF06D6A0)
+                                      : const Color(0xFFE63946),
+                                  width: 2,
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Numéro et icône
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isCorrect 
+                                              ? const Color(0xFF06D6A0)
+                                              : const Color(0xFFE63946),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          'Q${index + 1}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFFF1FAEE),
+                                          ),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Icon(
+                                        isCorrect ? Icons.check_circle : Icons.cancel,
+                                        color: isCorrect 
+                                            ? const Color(0xFF06D6A0)
+                                            : const Color(0xFFE63946),
+                                        size: 28,
+                                      ),
+                                    ],
+                                  ),
+                                  
+                                  const SizedBox(height: 12),
+                                  
+                                  // Question
+                                  Text(
+                                    question.question,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFFF1FAEE),
+                                    ),
+                                  ),
+                                  
+                                  const SizedBox(height: 8),
+                                  const Divider(color: Color(0xFF457B9D)),
+                                  const SizedBox(height: 8),
+                                  
+                                  // Ta réponse
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Ta réponse : ',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFFA8DADC),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          userAnswer,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: isCorrect 
+                                                ? const Color(0xFF06D6A0)
+                                                : const Color(0xFFE63946),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  
+                                  // Bonne réponse (si mauvaise réponse)
+                                  if (!isCorrect) ...[
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Bonne réponse : ',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color(0xFFA8DADC),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            correctAnswer,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF06D6A0),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
+                  
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Widget pour les cartes de statistiques
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-  final String value;
-
-  const _StatCard({
-    required this.icon,
-    required this.color,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1D3557),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color,
-          width: 2,
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: 40,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFFA8DADC),
-            ),
-          ),
-        ],
       ),
     );
   }
