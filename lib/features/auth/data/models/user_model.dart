@@ -29,6 +29,9 @@ class UserModel extends HiveObject {
   @HiveField(7)
   final DateTime createdAt;
 
+  @HiveField(8)
+  final String password;
+
   UserModel({
     required this.id,
     required this.pseudo,
@@ -38,6 +41,7 @@ class UserModel extends HiveObject {
     this.birthDate,
     this.profileImagePath,
     required this.createdAt,
+    required this.password,
   });
 
   // Conversion vers l'entité
@@ -51,6 +55,7 @@ class UserModel extends HiveObject {
       birthDate: birthDate,
       profileImagePath: profileImagePath,
       createdAt: createdAt,
+      password: password,
     );
   }
 
@@ -65,6 +70,7 @@ class UserModel extends HiveObject {
       birthDate: entity.birthDate,
       profileImagePath: entity.profileImagePath,
       createdAt: entity.createdAt,
+      password: entity.password,
     );
   }
 }

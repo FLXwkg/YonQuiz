@@ -7,6 +7,7 @@ class UserEntity {
   final String? birthDate;
   final String? profileImagePath;
   final DateTime createdAt;
+  final String password;
 
   const UserEntity({
     required this.id,
@@ -17,5 +18,6 @@ class UserEntity {
     this.birthDate,
     this.profileImagePath,
     required this.createdAt,
+    required this.password,
   });
 }

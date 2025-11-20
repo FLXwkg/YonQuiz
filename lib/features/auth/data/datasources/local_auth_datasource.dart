@@ -1,51 +1,65 @@
 import 'package:hive/hive.dart';
 import '../models/user_model.dart';
+import '../../domain/entities/user_entity.dart';
 
 class LocalAuthDatasource {
   static const String _boxName = 'users';
-  static const String _currentUserKey = 'current_user_id';
 
-  // Récupérer la box
-  Future<Box<UserModel>> _getUserBox() async {
+  /// Ouvre la box Hive
+  Future<Box<UserModel>> _openBox() async {
     return await Hive.openBox<UserModel>(_boxName);
   }
 
-  // Sauvegarder un utilisateur
-  Future<void> saveUser(UserModel user) async {
-    final box = await _getUserBox();
-    await box.put(user.id, user);
-    
-    // Définir comme utilisateur actuel
-    final prefs = Hive.box('app_prefs');
-    await prefs.put(_currentUserKey, user.id);
-    await prefs.put('has_created_account', true);
-    await prefs.put('is_logged_in', true);
-    
-    print('✅ Utilisateur sauvegardé: ${user.pseudo}');
+  /// Sauvegarde un utilisateur (accepte UserEntity)
+  Future<void> saveUser(UserEntity entity) async {
+    final box = await _openBox();
+    final model = UserModel.fromEntity(entity);
+    await box.put(entity.id, model);
   }
 
-  // Récupérer l'utilisateur actuel
-  Future<UserModel?> getCurrentUser() async {
-    final prefs = Hive.box('app_prefs');
-    final userId = prefs.get(_currentUserKey);
-    
-    if (userId == null) return null;
-    
-    final box = await _getUserBox();
-    return box.get(userId);
+  /// Récupère un utilisateur par son ID
+  Future<UserEntity?> getUserById(String id) async {
+    final box = await _openBox();
+    final model = box.get(id);
+    return model?.toEntity();
   }
 
-  // Déconnexion
-  Future<void> logout() async {
-    final prefs = Hive.box('app_prefs');
-    await prefs.put('is_logged_in', false);
-    print('👋 Utilisateur déconnecté');
+  /// Récupère un utilisateur par son pseudo
+  Future<UserEntity?> getUserByPseudo(String pseudo) async {
+    final box = await _openBox();
+    final model = box.values.firstWhere(
+      (user) => user.pseudo.toLowerCase() == pseudo.toLowerCase(),
+      orElse: () => UserModel(
+        id: '',
+        pseudo: '',
+        camp: '',
+        gender: '',
+        createdAt: DateTime.now(),
+        password: '',
+      ),
+    );
+    
+    // Si l'ID est vide, ça veut dire qu'aucun user n'a été trouvé
+    if (model.id.isEmpty) return null;
+    
+    return model.toEntity();
   }
 
-  // Supprimer un utilisateur
-  Future<void> deleteUser(String userId) async {
-    final box = await _getUserBox();
-    await box.delete(userId);
-    print('🗑️ Utilisateur supprimé');
+  /// Récupère tous les utilisateurs
+  Future<List<UserEntity>> getAllUsers() async {
+    final box = await _openBox();
+    return box.values.map((model) => model.toEntity()).toList();
+  }
+
+  /// Supprime un utilisateur
+  Future<void> deleteUser(String id) async {
+    final box = await _openBox();
+    await box.delete(id);
+  }
+
+  /// Vérifie si un utilisateur existe
+  Future<bool> userExists(String id) async {
+    final box = await _openBox();
+    return box.containsKey(id);
   }
 }
