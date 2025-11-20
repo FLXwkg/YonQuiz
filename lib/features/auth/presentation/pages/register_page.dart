@@ -28,7 +28,7 @@ class RegisterPage extends GetView<RegisterController> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 20),
-                  
+
                   // Titre
                   Text(
                     '🏴‍☠️ Rejoins l\'équipage !',
@@ -38,9 +38,9 @@ class RegisterPage extends GetView<RegisterController> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  
+
                   const SizedBox(height: 40),
-                  
+
                   // Pseudo
                   _buildTextField(
                     controller: controller.pseudoController,
@@ -56,9 +56,9 @@ class RegisterPage extends GetView<RegisterController> {
                       return null;
                     },
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Email (optionnel)
                   _buildTextField(
                     controller: controller.emailController,
@@ -66,9 +66,65 @@ class RegisterPage extends GetView<RegisterController> {
                     icon: Icons.email,
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  
+
+                  const SizedBox(height: 20),
+
+                  // 🔒 MOT DE PASSE
+                  Obx(() => _buildTextField(
+                    controller: controller.passwordController,
+                    label: 'Mot de passe',
+                    icon: Icons.lock,
+                    obscureText: controller.obscurePassword.value,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.obscurePassword.value
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.white70,
+                      ),
+                      onPressed: controller.togglePasswordVisibility,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Entre un mot de passe';
+                      }
+                      if (value.length < 6) {
+                        return 'Minimum 6 caractères';
+                      }
+                      return null;
+                    },
+                  )),
+
+                  const SizedBox(height: 20),
+
+                  // 🔒 CONFIRMATION MOT DE PASSE
+                  Obx(() => _buildTextField(
+                    controller: controller.confirmPasswordController,
+                    label: 'Confirmer le mot de passe',
+                    icon: Icons.lock_outline,
+                    obscureText: controller.obscureConfirmPassword.value,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.obscureConfirmPassword.value
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.white70,
+                      ),
+                      onPressed: controller.toggleConfirmPasswordVisibility,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Confirme ton mot de passe';
+                      }
+                      if (value != controller.passwordController.text) {
+                        return 'Les mots de passe ne correspondent pas';
+                      }
+                      return null;
+                    },
+                  )),
+
                   const SizedBox(height: 30),
-                  
+
                   // Choix du genre
                   const Text(
                     'Genre',
@@ -98,9 +154,9 @@ class RegisterPage extends GetView<RegisterController> {
                       ),
                     ],
                   )),
-                  
+
                   const SizedBox(height: 30),
-                  
+
                   // Choix du camp
                   const Text(
                     'Choisis ton camp',
@@ -132,9 +188,9 @@ class RegisterPage extends GetView<RegisterController> {
                       ),
                     ],
                   )),
-                  
+
                   const SizedBox(height: 40),
-                  
+
                   // Bouton de création
                   Obx(() => ElevatedButton(
                     onPressed: controller.isLoading.value 
@@ -162,6 +218,20 @@ class RegisterPage extends GetView<RegisterController> {
                             ),
                           ),
                   )),
+
+                  const SizedBox(height: 16),
+
+                  // Lien retour vers Login
+                  TextButton(
+                    onPressed: () => Get.back(),
+                    child: const Text(
+                      'Déjà un compte ? Se connecter',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -177,16 +247,20 @@ class RegisterPage extends GetView<RegisterController> {
     required IconData icon,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
+    bool obscureText = false,
+    Widget? suffixIcon,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      obscureText: obscureText,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white70),
         prefixIcon: Icon(icon, color: Colors.white70),
+        suffixIcon: suffixIcon,
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
         border: OutlineInputBorder(

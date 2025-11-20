@@ -9,8 +9,9 @@ import '../../features/quiz/presentation/pages/quiz_game_page.dart';
 import '../../features/quiz/presentation/pages/quiz_result_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/bindings/register_binding.dart';
+import '../../features/auth/presentation/bindings/login_binding.dart';
 import 'app_routes.dart';
-import 'package:flutter/material.dart';  // ✅ AJOUTÉ
+
 
 class AppPages {
   static final routes = [
@@ -31,10 +32,6 @@ class AppPages {
       binding: RegisterBinding(),
     ),
     
-    GetPage(
-      name: AppRoutes.login,
-      page: () => const LoginPage(),
-    ),
     
     // ✅ ROUTE TEMPORAIRE POUR /home
     GetPage(
@@ -54,6 +51,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.quizResult,
       page: () => const QuizResultPage(),
+    ),
+    GetPage(
+      name: AppRoutes.login,
+      page: () => const LoginPage(),
+      binding: LoginBinding(), // 
     ),
 
     // Learn
