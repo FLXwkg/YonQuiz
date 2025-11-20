@@ -9,6 +9,9 @@ import '../../features/quiz/presentation/pages/quiz_game_page.dart';
 import '../../features/quiz/presentation/pages/quiz_result_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/bindings/register_binding.dart';
+import '../../features/learn/presentation/pages/learn_home_page.dart';
+import '../../features/learn/presentation/pages/characters_list_page.dart';
+
 import 'app_routes.dart';
 import 'package:flutter/material.dart';  // ✅ AJOUTÉ
 
@@ -57,9 +60,13 @@ class AppPages {
     ),
 
     // Learn
-    // GetPage(
-    //   name: AppRoutes.learnHome,
-    //   page: () => const LearnHomePage(),
-    // ),
+    GetPage(
+      name: AppRoutes.learnHome,
+      page: () => const LearnHomePage(),
+    ),
+    GetPage(
+      name: AppRoutes.charactersList,
+      page: () => const CharactersListPage(),
+    ),
   ];
 }
